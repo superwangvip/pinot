@@ -16,6 +16,7 @@
 package com.linkedin.pinot.pql.parsers;
 
 import com.linkedin.pinot.common.request.BrokerRequest;
+import com.linkedin.pinot.common.request.transform.TransformExpressionTree;
 import com.linkedin.pinot.pql.parsers.pql2.ast.AstNode;
 import com.linkedin.pinot.pql.parsers.pql2.ast.BaseAstNode;
 import org.antlr.runtime.RecognitionException;
@@ -70,6 +71,26 @@ public class Pql2Compiler extends AbstractCompiler {
     } catch (Exception e) {
       throw new Pql2CompilationException(e.getMessage());
     }
+  }
+
+  @Override
+  public TransformExpressionTree compileToExpressionTree(String expression) {
+    CharStream charStream = new ANTLRInputStream(expression);
+    PQL2Lexer lexer = new PQL2Lexer(charStream);
+    lexer.setTokenFactory(new CommonTokenFactory(true));
+    TokenStream tokenStream = new UnbufferedTokenStream<CommonToken>(lexer);
+    PQL2Parser parser = new PQL2Parser(tokenStream);
+    parser.setErrorHandler(new BailErrorStrategy());
+
+    // Parse
+    ParseTree parseTree = parser.expression();
+
+    ParseTreeWalker walker = new ParseTreeWalker();
+    Pql2AstListener listener = new Pql2AstListener();
+    walker.walk(listener, parseTree);
+
+    final AstNode rootNode = listener.getRootNode();
+    return TransformExpressionTree.buildTree(rootNode, 0);
   }
 
   @Override
