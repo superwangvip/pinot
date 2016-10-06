@@ -52,7 +52,7 @@ public class BalanceNumSegmentAssignmentStrategyIntegrationTest extends UploadRe
 
     // Create one table with a replication factor of three
     JSONObject request = ControllerRequestBuilder.buildCreateOfflineTableJSON("mytable", null, null, "DaysSinceEpoch",
-        "DAYS", "DAYS", "300", 3, "BalanceNumSegmentAssignmentStrategy", Collections.<String>emptyList(), "MMAP");
+        "DAYS", "DAYS", "300", 3, "BalanceNumSegmentAssignmentStrategy", Collections.<String>emptyList(), "MMAP", "v1");
     sendPostRequest(ControllerRequestURLBuilder.baseUrl(CONTROLLER_BASE_API_URL).forTableCreate(), request.toString());
 
     // Create eight dummy server instances
